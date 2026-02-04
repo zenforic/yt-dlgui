@@ -4,7 +4,7 @@ use iced::{Alignment, Element, Fill};
 use crate::app::DownloadState;
 use crate::message::{Format, Message};
 use crate::theme::{
-    main_container_style, pick_list_style, primary_button_style,
+    pick_list_style, primary_button_style,
     progress_bar_style, secondary_button_style, text_input_style, danger_button_style,
 };
 
@@ -138,7 +138,6 @@ pub fn home_view<'a>(
     container(content)
         .width(Fill)
         .height(Fill)
-        .style(main_container_style)
         .into()
 }
 

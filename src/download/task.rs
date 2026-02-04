@@ -116,8 +116,7 @@ impl DownloadTask {
 
         // JS Runtimes (for YouTube JS challenges)
         if !self.settings.js_runtimes.is_empty() {
-            cmd.arg("--extractor-args")
-                .arg(format!("youtube:player_client=web;js_runtimes={}", self.settings.js_runtimes));
+            cmd.arg("--js-runtimes").arg(&self.settings.js_runtimes);
         }
 
         // Extra arguments

@@ -5,7 +5,7 @@ pub fn custom_theme() -> Theme {
     Theme::custom(
         "yt-dlgui Dark".to_string(),
         iced::theme::Palette {
-            background: Color::from_rgba(0.10, 0.10, 0.12, 0.95),
+            background: Color::from_rgb(0.10, 0.10, 0.12),
             text: Color::from_rgb(0.90, 0.90, 0.90),
             primary: Color::from_rgb(0.85, 0.20, 0.25),
             success: Color::from_rgb(0.30, 0.70, 0.35),
@@ -15,20 +15,12 @@ pub fn custom_theme() -> Theme {
     )
 }
 
-pub fn main_container_style(_theme: &Theme) -> container::Style {
+pub fn window_container_style(_theme: &Theme) -> container::Style {
     container::Style {
-        background: Some(Background::Color(Color::from_rgba(0.10, 0.10, 0.12, 0.95))),
+        background: Some(Background::Color(Color::from_rgb(0.10, 0.10, 0.12))),
         text_color: Some(Color::from_rgb(0.90, 0.90, 0.90)),
-        ..Default::default()
-    }
-}
-
-pub fn window_container_style(_theme: &Theme, opacity: f32) -> container::Style {
-    container::Style {
-        background: Some(Background::Color(Color::from_rgba(0.10, 0.10, 0.12, 0.92 * opacity))),
-        text_color: Some(Color::from_rgba(0.90, 0.90, 0.90, opacity)),
         border: Border {
-            color: Color::from_rgba(0.85, 0.20, 0.25, 0.6 * opacity),
+            color: Color::from_rgba(0.85, 0.20, 0.25, 0.6),
             width: 1.0,
             radius: 8.0.into(),
         },
@@ -38,10 +30,10 @@ pub fn window_container_style(_theme: &Theme, opacity: f32) -> container::Style 
 
 pub fn title_bar_style(_theme: &Theme) -> container::Style {
     container::Style {
-        background: Some(Background::Color(Color::from_rgba(0.08, 0.08, 0.10, 1.0))),
+        background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.2))),
         text_color: Some(Color::from_rgb(0.90, 0.90, 0.90)),
         border: Border {
-            color: Color::from_rgba(0.25, 0.25, 0.28, 0.5),
+            color: Color::from_rgba(0.25, 0.25, 0.28, 0.3),
             width: 0.0,
             radius: 0.0.into(),
         },

@@ -18,7 +18,6 @@ fn main() -> iced::Result {
         .window(window::Settings {
             size: Size::new(500.0, 380.0),
             min_size: Some(Size::new(400.0, 330.0)),
-            transparent: true,
             decorations: false,
             ..Default::default()
         })

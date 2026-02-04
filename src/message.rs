@@ -30,9 +30,6 @@ pub enum Message {
     WindowMinimize,
     WindowClose,
     WindowDrag,
-
-    // Animation
-    Tick,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

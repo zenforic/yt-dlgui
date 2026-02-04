@@ -1,7 +1,6 @@
 use iced::widget::container;
 use iced::window;
 use iced::{Element, Fill, Subscription, Task, Theme};
-use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
 
 use crate::components::{home_view, settings_dialog, title_bar};
@@ -12,13 +11,6 @@ use crate::settings::AdvancedSettings;
 use crate::theme::{custom_theme, window_container_style};
 use crate::widgets::modal;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum WindowAnimation {
-    FadingIn,
-    Visible,
-    FadingOut,
-}
-
 pub struct App {
     url: String,
     format: Format,
@@ -28,9 +20,6 @@ pub struct App {
     show_settings: bool,
     persist_settings: bool,
     cancel_sender: Option<mpsc::Sender<()>>,
-    opacity: f32,
-    animation_state: WindowAnimation,
-    animation_start: Option<Instant>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -55,8 +44,6 @@ pub enum DownloadState {
 }
 
 impl App {
-    const FADE_DURATION: Duration = Duration::from_millis(200);
-
     pub fn new() -> (Self, Task<Message>) {
         let (settings, persist) = config::load_settings()
             .map(|s| (s, true))
@@ -72,21 +59,13 @@ impl App {
                 show_settings: false,
                 persist_settings: persist,
                 cancel_sender: None,
-                opacity: 0.0,
-                animation_state: WindowAnimation::FadingIn,
-                animation_start: Some(Instant::now()),
             },
             Task::none(),
         )
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
-        match self.animation_state {
-            WindowAnimation::FadingIn | WindowAnimation::FadingOut => {
-                iced::time::every(Duration::from_millis(16)).map(|_| Message::Tick)
-            }
-            WindowAnimation::Visible => Subscription::none(),
-        }
+        Subscription::none()
     }
 
 
@@ -268,37 +247,10 @@ impl App {
                 window::oldest().and_then(|id| window::minimize(id, true))
             }
             Message::WindowClose => {
-                self.animation_state = WindowAnimation::FadingOut;
-                self.animation_start = Some(Instant::now());
-                Task::none()
+                window::oldest().and_then(window::close)
             }
             Message::WindowDrag => {
                 window::oldest().and_then(window::drag)
-            }
-            Message::Tick => {
-                if let Some(start) = self.animation_start {
-                    let elapsed = start.elapsed();
-                    let progress = (elapsed.as_secs_f32() / Self::FADE_DURATION.as_secs_f32()).min(1.0);
-
-                    match self.animation_state {
-                        WindowAnimation::FadingIn => {
-                            self.opacity = progress;
-                            if progress >= 1.0 {
-                                self.opacity = 1.0;
-                                self.animation_state = WindowAnimation::Visible;
-                                self.animation_start = None;
-                            }
-                        }
-                        WindowAnimation::FadingOut => {
-                            self.opacity = 1.0 - progress;
-                            if progress >= 1.0 {
-                                return window::oldest().and_then(window::close);
-                            }
-                        }
-                        WindowAnimation::Visible => {}
-                    }
-                }
-                Task::none()
             }
         }
     }
@@ -322,7 +274,7 @@ impl App {
         container(content)
             .width(Fill)
             .height(Fill)
-            .style(move |theme| window_container_style(theme, self.opacity))
+            .style(window_container_style)
             .into()
     }
 }
