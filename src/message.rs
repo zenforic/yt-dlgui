@@ -51,9 +51,9 @@ impl Format {
         Format::Aac,
     ];
 
-    pub fn is_audio(&self) -> bool {
+    /*pub fn is_audio(&self) -> bool {
         matches!(self, Format::Mp3 | Format::Aac)
-    }
+    }*/
 }
 
 impl std::fmt::Display for Format {
