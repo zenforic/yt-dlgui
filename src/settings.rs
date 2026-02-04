@@ -33,6 +33,7 @@ pub struct AdvancedSettings {
 
     // Advanced
     pub ytdlp_path: String,
+    pub js_runtimes: String,
     pub extra_arguments: String,
 }
 
@@ -70,6 +71,7 @@ impl Default for AdvancedSettings {
 
             // Advanced
             ytdlp_path: "yt-dlp".to_string(),
+            js_runtimes: String::new(),
             extra_arguments: String::new(),
         }
     }

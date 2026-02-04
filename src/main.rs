@@ -14,11 +14,12 @@ fn main() -> iced::Result {
     iced::application(App::new, App::update, App::view)
         .title("yt-dlgui")
         .theme(App::theme)
+        .subscription(App::subscription)
         .window(window::Settings {
-            size: Size::new(500.0, 350.0),
-            min_size: Some(Size::new(400.0, 300.0)),
+            size: Size::new(500.0, 380.0),
+            min_size: Some(Size::new(400.0, 330.0)),
             transparent: true,
-            decorations: true,
+            decorations: false,
             ..Default::default()
         })
         .run()

@@ -23,6 +23,85 @@ pub fn main_container_style(_theme: &Theme) -> container::Style {
     }
 }
 
+pub fn window_container_style(_theme: &Theme, opacity: f32) -> container::Style {
+    container::Style {
+        background: Some(Background::Color(Color::from_rgba(0.10, 0.10, 0.12, 0.92 * opacity))),
+        text_color: Some(Color::from_rgba(0.90, 0.90, 0.90, opacity)),
+        border: Border {
+            color: Color::from_rgba(0.85, 0.20, 0.25, 0.6 * opacity),
+            width: 1.0,
+            radius: 8.0.into(),
+        },
+        ..Default::default()
+    }
+}
+
+pub fn title_bar_style(_theme: &Theme) -> container::Style {
+    container::Style {
+        background: Some(Background::Color(Color::from_rgba(0.08, 0.08, 0.10, 1.0))),
+        text_color: Some(Color::from_rgb(0.90, 0.90, 0.90)),
+        border: Border {
+            color: Color::from_rgba(0.25, 0.25, 0.28, 0.5),
+            width: 0.0,
+            radius: 0.0.into(),
+        },
+        ..Default::default()
+    }
+}
+
+pub fn title_bar_button_style(_theme: &Theme, status: button::Status) -> button::Style {
+    let base = button::Style {
+        background: Some(Background::Color(Color::TRANSPARENT)),
+        text_color: Color::from_rgb(0.70, 0.70, 0.70),
+        border: Border {
+            radius: 4.0.into(),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    match status {
+        button::Status::Active => base,
+        button::Status::Hovered => button::Style {
+            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.1))),
+            text_color: Color::from_rgb(0.90, 0.90, 0.90),
+            ..base
+        },
+        button::Status::Pressed => button::Style {
+            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.05))),
+            ..base
+        },
+        button::Status::Disabled => base,
+    }
+}
+
+pub fn close_button_style(_theme: &Theme, status: button::Status) -> button::Style {
+    let base = button::Style {
+        background: Some(Background::Color(Color::TRANSPARENT)),
+        text_color: Color::from_rgb(0.70, 0.70, 0.70),
+        border: Border {
+            radius: 4.0.into(),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    match status {
+        button::Status::Active => base,
+        button::Status::Hovered => button::Style {
+            background: Some(Background::Color(Color::from_rgb(0.85, 0.20, 0.25))),
+            text_color: Color::WHITE,
+            ..base
+        },
+        button::Status::Pressed => button::Style {
+            background: Some(Background::Color(Color::from_rgb(0.70, 0.15, 0.20))),
+            text_color: Color::WHITE,
+            ..base
+        },
+        button::Status::Disabled => base,
+    }
+}
+
 pub fn modal_backdrop_style(_theme: &Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.6))),
@@ -90,8 +169,9 @@ pub fn secondary_button_style(_theme: &Theme, status: button::Status) -> button:
         background: Some(Background::Color(Color::from_rgb(0.25, 0.25, 0.28))),
         text_color: Color::from_rgb(0.90, 0.90, 0.90),
         border: Border {
+            color: Color::from_rgba(0.85, 0.20, 0.25, 0.5),
+            width: 1.0,
             radius: 4.0.into(),
-            ..Default::default()
         },
         ..Default::default()
     };
@@ -100,6 +180,11 @@ pub fn secondary_button_style(_theme: &Theme, status: button::Status) -> button:
         button::Status::Active => base,
         button::Status::Hovered => button::Style {
             background: Some(Background::Color(Color::from_rgb(0.30, 0.30, 0.33))),
+            border: Border {
+                color: Color::from_rgba(0.85, 0.20, 0.25, 0.8),
+                width: 1.0,
+                radius: 4.0.into(),
+            },
             ..base
         },
         button::Status::Pressed => button::Style {
@@ -109,6 +194,11 @@ pub fn secondary_button_style(_theme: &Theme, status: button::Status) -> button:
         button::Status::Disabled => button::Style {
             background: Some(Background::Color(Color::from_rgb(0.18, 0.18, 0.20))),
             text_color: Color::from_rgb(0.50, 0.50, 0.50),
+            border: Border {
+                color: Color::from_rgba(0.50, 0.20, 0.22, 0.3),
+                width: 1.0,
+                radius: 4.0.into(),
+            },
             ..base
         },
     }

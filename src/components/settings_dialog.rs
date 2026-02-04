@@ -172,6 +172,12 @@ pub fn settings_dialog<'a>(
                         |s| Message::SettingsChanged(SettingsField::YtDlpPath(s)),
                     ),
                     labeled_input(
+                        "JS Runtimes",
+                        "e.g., deno,nodejs (for YouTube JS challenges)",
+                        &settings.js_runtimes,
+                        |s| Message::SettingsChanged(SettingsField::JsRuntimes(s)),
+                    ),
+                    labeled_input(
                         "Extra Arguments",
                         "Additional command-line arguments",
                         &settings.extra_arguments,

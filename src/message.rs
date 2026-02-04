@@ -25,6 +25,14 @@ pub enum Message {
 
     // Modal backdrop click
     ModalBackdropClicked,
+
+    // Window controls
+    WindowMinimize,
+    WindowClose,
+    WindowDrag,
+
+    // Animation
+    Tick,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -110,5 +118,6 @@ pub enum SettingsField {
 
     // Advanced
     YtDlpPath(String),
+    JsRuntimes(String),
     ExtraArguments(String),
 }

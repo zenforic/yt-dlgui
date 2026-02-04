@@ -114,6 +114,12 @@ impl DownloadTask {
             cmd.arg("--cookies").arg(&self.settings.cookies_file);
         }
 
+        // JS Runtimes (for YouTube JS challenges)
+        if !self.settings.js_runtimes.is_empty() {
+            cmd.arg("--extractor-args")
+                .arg(format!("youtube:player_client=web;js_runtimes={}", self.settings.js_runtimes));
+        }
+
         // Extra arguments
         if !self.settings.extra_arguments.is_empty() {
             for arg in self.settings.extra_arguments.split_whitespace() {
@@ -138,10 +144,7 @@ impl DownloadTask {
 
         // Prevent window popup on Windows
         #[cfg(windows)]
-        {
-            use std::os::windows::process::CommandExt;
-            cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
-        }
+        cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
 
         let mut child = cmd.spawn().map_err(|e| format!("Failed to start yt-dlp: {}", e))?;
 

@@ -1,14 +1,23 @@
 use iced::widget::container;
-use iced::{Element, Fill, Task, Theme};
+use iced::window;
+use iced::{Element, Fill, Subscription, Task, Theme};
+use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
 
-use crate::components::{home_view, settings_dialog};
+use crate::components::{home_view, settings_dialog, title_bar};
 use crate::config;
 use crate::download::DownloadTask;
 use crate::message::{DownloadProgress, Format, Message, SettingsField};
 use crate::settings::AdvancedSettings;
-use crate::theme::{custom_theme, main_container_style};
+use crate::theme::{custom_theme, window_container_style};
 use crate::widgets::modal;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum WindowAnimation {
+    FadingIn,
+    Visible,
+    FadingOut,
+}
 
 pub struct App {
     url: String,
@@ -19,6 +28,9 @@ pub struct App {
     show_settings: bool,
     persist_settings: bool,
     cancel_sender: Option<mpsc::Sender<()>>,
+    opacity: f32,
+    animation_state: WindowAnimation,
+    animation_start: Option<Instant>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -43,6 +55,8 @@ pub enum DownloadState {
 }
 
 impl App {
+    const FADE_DURATION: Duration = Duration::from_millis(200);
+
     pub fn new() -> (Self, Task<Message>) {
         let (settings, persist) = config::load_settings()
             .map(|s| (s, true))
@@ -58,9 +72,21 @@ impl App {
                 show_settings: false,
                 persist_settings: persist,
                 cancel_sender: None,
+                opacity: 0.0,
+                animation_state: WindowAnimation::FadingIn,
+                animation_start: Some(Instant::now()),
             },
             Task::none(),
         )
+    }
+
+    pub fn subscription(&self) -> Subscription<Message> {
+        match self.animation_state {
+            WindowAnimation::FadingIn | WindowAnimation::FadingOut => {
+                iced::time::every(Duration::from_millis(16)).map(|_| Message::Tick)
+            }
+            WindowAnimation::Visible => Subscription::none(),
+        }
     }
 
 
@@ -232,7 +258,44 @@ impl App {
                         SettingsField::ConcurrentFragments(v) => settings.concurrent_fragments = v,
                         SettingsField::CookiesFile(v) => settings.cookies_file = v,
                         SettingsField::YtDlpPath(v) => settings.ytdlp_path = v,
+                        SettingsField::JsRuntimes(v) => settings.js_runtimes = v,
                         SettingsField::ExtraArguments(v) => settings.extra_arguments = v,
+                    }
+                }
+                Task::none()
+            }
+            Message::WindowMinimize => {
+                window::oldest().and_then(|id| window::minimize(id, true))
+            }
+            Message::WindowClose => {
+                self.animation_state = WindowAnimation::FadingOut;
+                self.animation_start = Some(Instant::now());
+                Task::none()
+            }
+            Message::WindowDrag => {
+                window::oldest().and_then(window::drag)
+            }
+            Message::Tick => {
+                if let Some(start) = self.animation_start {
+                    let elapsed = start.elapsed();
+                    let progress = (elapsed.as_secs_f32() / Self::FADE_DURATION.as_secs_f32()).min(1.0);
+
+                    match self.animation_state {
+                        WindowAnimation::FadingIn => {
+                            self.opacity = progress;
+                            if progress >= 1.0 {
+                                self.opacity = 1.0;
+                                self.animation_state = WindowAnimation::Visible;
+                                self.animation_start = None;
+                            }
+                        }
+                        WindowAnimation::FadingOut => {
+                            self.opacity = 1.0 - progress;
+                            if progress >= 1.0 {
+                                return window::oldest().and_then(window::close);
+                            }
+                        }
+                        WindowAnimation::Visible => {}
                     }
                 }
                 Task::none()
@@ -241,18 +304,25 @@ impl App {
     }
 
     pub fn view(&self) -> Element<'_, Message> {
+        use iced::widget::column;
+
+        let title = title_bar();
         let home = home_view(&self.url, self.format, &self.download_state);
 
-        if self.show_settings {
+        let main_content = column![title, home];
+
+        let content: Element<'_, Message> = if self.show_settings {
             let settings = self.pending_settings.as_ref().unwrap_or(&self.settings);
             let dialog = settings_dialog(settings, self.persist_settings);
-            modal(home, dialog, Message::ModalBackdropClicked)
+            modal(main_content, dialog, Message::ModalBackdropClicked)
         } else {
-            container(home)
-                .width(Fill)
-                .height(Fill)
-                .style(main_container_style)
-                .into()
-        }
+            main_content.into()
+        };
+
+        container(content)
+            .width(Fill)
+            .height(Fill)
+            .style(move |theme| window_container_style(theme, self.opacity))
+            .into()
     }
 }
