@@ -3,6 +3,8 @@
 ## Building:
 After installing [Rust](https://rustup.rs/), simply run in the root directory:
 
+This icon branch is just a version of the last stable version of the code with an icon reference. In this branch it's required to have an icon in a resources folder, however you can change the name of the icon reference in the `src/main.rs` file (defaults to `resources/zenforic.ico`). This build will give the window and file an icon, as well as change its taskbar icon, via changes in `src/main.rs` and the additional `build.rs`.
+
 `cargo build` for the debug version or:
 `cargo build --release` for the release optimized version.
 
